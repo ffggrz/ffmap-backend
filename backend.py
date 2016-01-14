@@ -137,17 +137,33 @@ def main(params):
     batadv_graph = graph.to_undirected(batadv_graph)
 
     # write processed data to dest dir
-    with open(nodes_fn, 'w') as f:
+    with open(nodes_fn + '.tmp', 'w') as f:
         json.dump(nodedb, f)
+        # prevent glitch if files is reading while the new content is writing
+        f.flush() # From Python-Docs: first do f.flush()
+        os.fsync(f.fileno()) # and then do os.fsync(f.fileno())
+        # to ensure that all internal buffers associated with f are written to disk.
+    os.rename(nodes_fn + '.tmp', nodes_fn) # move new file to real position
 
     graph_out = {'batadv': json_graph.node_link_data(batadv_graph),
                  'version': GRAPH_VERSION}
 
-    with open(graph_fn, 'w') as f:
+    with open(graph_fn + '.tmp', 'w') as f:
         json.dump(graph_out, f)
+        # prevent glitch if files is reading while the new content is writing
+        f.flush() # From Python-Docs: first do f.flush()
+        os.fsync(f.fileno()) # and then do os.fsync(f.fileno())
+        # to ensure that all internal buffers associated with f are written to disk.
+    os.rename(graph_fn + '.tmp', graph_fn) # move new file to real position
 
-    with open(nodelist_fn, 'w') as f:
+    with open(nodelist_fn + '.tmp', 'w') as f:
         json.dump(export_nodelist(now, nodedb), f)
+        # prevent glitch if files is reading while the new content is writing
+        f.flush() # From Python-Docs: first do f.flush()
+        os.fsync(f.fileno()) # and then do os.fsync(f.fileno())
+        # to ensure that all internal buffers associated with f are written to disk.
+    os.rename(nodelist_fn + '.tmp', nodelist_fn) # move new file to real position
+
 
     # optional rrd graphs (trigger with --rrd)
     if params['rrd']:
