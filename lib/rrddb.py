@@ -42,6 +42,9 @@ class RRD(object):
         self.globalDb.graph(os.path.join(self.imagePath, "globalGraph.png"),
                             self.displayTimeGlobal)
 
+        self.globalDb.graph(os.path.join(self.imagePath, "globalGraph52.png"),
+                            "365d")
+
         nodedb_files = os.listdir(self.dbPath)
 
         for file_name in nodedb_files:
